@@ -1,0 +1,4 @@
+/* Register page reuses the CarHub auth design system */
+@import url('login.css');
+
+.register-container { max-width: 420px; }

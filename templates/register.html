@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - CarHub</title>
+    <link rel="icon" type="image/png" href="/static/assets/favicon.png">
+    <link rel="apple-touch-icon" href="/static/assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="/static/register.css">
+</head>
+<body>
+    <div class="auth-shell">
+        <div>
+            <a href="/cars" class="auth-brand" style="display:block;">
+                <img src="/static/assets/logo-header.png" alt="CarHub">
+            </a>
+
+            <div class="register-container">
+                <h1 class="title">Create your account</h1>
+                <p class="subtitle">Join CarHub and find your perfect ride</p>
+                 {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert {{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="/register" method="POST" class="register-form">
+                    <div class="input-group">
+                        <label for="fullname">Full Name</label>
+                        <input type="text" id="fullname" name="fullname" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" placeholder="Enter email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Enter password" required>
+                    </div>
+
+                    <button type="submit" class="btn">Register</button>
+
+                    <p class="login-link">
+                        Already have an account? <a href="/login">Login here</a>
+                    </p>
+                </form>
+            </div>
+            <a href="/cars" class="back-home">← Back to browsing</a>
+        </div>
+    </div>
+</body>
+</html>

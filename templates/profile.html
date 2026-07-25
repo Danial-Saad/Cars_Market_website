@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile - CarHub</title>
+  <link rel="icon" type="image/png" href="/static/assets/favicon.png">
+    <link rel="apple-touch-icon" href="/static/assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="/static/theme.css" />
+  <link rel="stylesheet" href="/static/cars.css" />
+  <script src="/static/script.js" defer></script>
+</head>
+
+<body>
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <a href="/cars" class="brand"><img src="/static/assets/logo-header.png" alt="CarHub"></a>
+    <button id="hamburger" class="hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav>
+      <ul>
+        <li><a href="/cars">Cars</a></li>
+        <li><a href="/wishlist" class="nav-love">Favorites</a></li>
+        <li><a href="/compare">Compare</a></li>
+        {% if session.get('is_admin') %}
+        <li><a href="/admin" class="nav-admin">Admin</a></li>
+        {% endif %}
+        <li>
+          <a href="/profile" class="active nav-profile">{{ session['fullname'] }}</a>
+        </li>
+        <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
+        <li><a href="/logout" class="nav-logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div id="nav-overlay" class="nav-overlay"></div>
+  <div class="header-bevel"></div>
+
+  <!-- ============ PROFILE PAGE ============ -->
+  <div style="max-width: 500px; margin: 3rem auto; padding: 0 1rem">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
+    <div
+      style="padding: 1rem; border-radius: 10px; margin-bottom: 1rem; text-align: center;
+                                background: {{ 'var(--color-background-success)' if category == 'success' else 'var(--color-background-danger)' }};
+                                color: {{ 'var(--color-text-success)' if category == 'success' else 'var(--color-text-danger)' }};
+                                border: 1px solid {{ 'var(--color-border-success)' if category == 'success' else 'var(--color-border-danger)' }};">
+      {{ message }}
+    </div>
+    {% endfor %} {% endif %} {% endwith %}
+
+    <!-- البطاقة الرئيسية -->
+    <div style="
+          background: var(--card-bg);
+          border-radius: 20px;
+          padding: 2.5rem;
+          box-shadow: 0 10px 30px var(--shadow);
+        ">
+      <!-- الأيقونة والعنوان -->
+      <div style="text-align: center; margin-bottom: 2rem">
+        <div style="
+              width: 80px;
+              height: 80px;
+              border-radius: 50%;
+              background: var(--primary);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 1rem;
+              font-size: 2rem;
+            ">
+          👤
+        </div>
+        <h2 style="color: var(--text-main); margin-bottom: 0.3rem">
+          {{ user['fullname'] }}
+        </h2>
+        <p style="color: var(--text-light); font-size: 0.95rem">
+          {{ user['email'] }}
+        </p>
+        {% if user['is_admin'] %}
+        <span style="
+              background: #f59e0b;
+              color: white;
+              padding: 3px 12px;
+              border-radius: 20px;
+              font-size: 0.8rem;
+              font-weight: bold;
+            ">⚙️ Admin</span>
+        {% endif %}
+      </div>
+
+      <!-- فرق فاصل -->
+      <hr style="
+            border: none;
+            border-top: 1px solid var(--shadow);
+            margin-bottom: 2rem;
+          " />
+
+      <!-- فورم تعديل الاسم -->
+      <form action="/profile" method="POST">
+        <div style="margin-bottom: 1.5rem">
+          <label style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-light);
+                font-size: 0.9rem;
+                font-weight: bold;
+              ">
+            Full Name
+          </label>
+          <input type="text" name="fullname" value="{{ user['fullname'] }}" required minlength="2" style="
+                width: 100%;
+                padding: 0.8rem 1rem;
+                border-radius: 10px;
+                border: 1px solid var(--shadow);
+                background: var(--bg-color);
+                color: var(--text-main);
+                font-size: 1rem;
+                outline: none;
+                box-sizing: border-box;
+              " />
+        </div>
+
+        <!-- Email (للعرض فقط، غير قابل للتعديل) -->
+        <div style="margin-bottom: 2rem">
+          <label style="
+                display: block;
+                margin-bottom: 0.5rem;
+                color: var(--text-light);
+                font-size: 0.9rem;
+                font-weight: bold;
+              ">
+            Email
+            <span style="font-weight: normal; font-size: 0.8rem">(cannot be changed)</span>
+          </label>
+          <input type="email" value="{{ user['email'] }}" disabled style="
+                width: 100%;
+                padding: 0.8rem 1rem;
+                border-radius: 10px;
+                border: 1px solid var(--shadow);
+                background: var(--bg-color);
+                color: var(--text-light);
+                font-size: 1rem;
+                opacity: 0.6;
+                box-sizing: border-box;
+                cursor: not-allowed;
+              " />
+        </div>
+
+        <button type="submit" class="btn" style="width: 100%; padding: 0.9rem; font-size: 1rem">
+          Save Changes
+        </button>
+      </form>
+    </div>
+
+    <!-- زر العودة -->
+    <div style="text-align: center; margin-top: 1.5rem">
+      <a href="/cars" style="
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+          ">
+        ← Back to Cars
+      </a>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="/static/assets/logo-header.png" alt="CarHub">
+        <p>CarHub helps you search, compare, and shortlist cars — all in one place.</p>
+      </div>
+      <div class="footer-links">
+        <div>
+          <h4>Browse</h4>
+          <ul>
+            <li><a href="/cars">All Cars</a></li>
+            <li><a href="/compare">Compare</a></li>
+            <li><a href="/wishlist">Favorites</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <ul>
+            <li><a href="/profile">My Profile</a></li>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 CarHub — Find your perfect ride.</div>
+  </footer>
+</body>
+
+</html>

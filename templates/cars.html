@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarHub - Find Your Perfect Ride</title>
+    <link rel="icon" type="image/png" href="/static/assets/favicon.png">
+    <link rel="apple-touch-icon" href="/static/assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="/static/theme.css">
+    <link rel="stylesheet" href="/static/cars.css">
+    <script src="/static/script.js" defer></script>
+</head>
+
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="site-header">
+        <a href="/cars" class="brand"><img src="/static/assets/logo-header.png" alt="CarHub"></a>
+        <button id="hamburger" class="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <nav>
+            <ul>
+                <li><a href="/cars" class="active">Cars</a></li>
+                <li><a href="/wishlist" class="nav-love">Favorites</a></li>
+                <li><a href="/compare">Compare</a></li>
+                {% if session.get('is_admin') %}
+                <li><a href="/admin" class="nav-admin">Admin</a></li>
+                {% endif %}
+                <li><a href="/profile" class="nav-profile">{{ session['fullname'] }}</a></li>
+                <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
+                <li><a href="/logout" class="nav-logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div id="nav-overlay" class="nav-overlay"></div>
+    <div class="header-bevel"></div>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+        <h2>Find your perfect ride</h2>
+        <p>Search, compare, and shortlist cars from every major brand in one place.</p>
+    </section>
+
+    <!-- ============ FILTERS ============ -->
+    <section class="filters">
+        <h2>Find Your Car</h2>
+        <form action="/cars" method="GET" class="filter-form">
+
+            <input type="text" name="q" placeholder="Search by name or brand..." value="{{ search_word or '' }}">
+
+            <input type="number" name="min_price" placeholder="Min Price" min="0" value="{{ filters.min_price or '' }}">
+            <input type="number" name="max_price" placeholder="Max Price" min="0" value="{{ filters.max_price or '' }}">
+
+            <select name="year">
+                <option value="any">Any Year</option>
+                {% for y in years %}
+                <option value="{{ y }}" {% if filters.year==y|string %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="color">
+                <option value="any">Any Color</option>
+                {% for c in colors %}
+                <option value="{{ c }}" {% if filters.color==c %}selected{% endif %}>{{ c }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="brand">
+                <option value="any">Any Brand</option>
+                {% for b in brands %}
+                <option value="{{ b }}" {% if filters.brand==b %}selected{% endif %}>{{ b }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="fuel_type">
+                <option value="any">Any Fuel</option>
+                {% for f in fuel_types %}
+                <option value="{{ f }}" {% if filters.fuel_type==f %}selected{% endif %}>{{ f }}</option>
+                {% endfor %}
+            </select>
+
+            <select name="sort_by">
+                <option value="">Sort by</option>
+                <option value="price_asc" {% if filters.sort_by=='price_asc' %}selected{% endif %}>Price: Low to High
+                </option>
+                <option value="price_desc" {% if filters.sort_by=='price_desc' %}selected{% endif %}>Price: High to Low
+                </option>
+                <option value="year_desc" {% if filters.sort_by=='year_desc' %}selected{% endif %}>Year: Newest</option>
+                <option value="year_asc" {% if filters.sort_by=='year_asc' %}selected{% endif %}>Year: Oldest</option>
+                <option value="name_asc" {% if filters.sort_by=='name_asc' %}selected{% endif %}>Name: A → Z</option>
+                <option value="name_desc" {% if filters.sort_by=='name_desc' %}selected{% endif %}>Name: Z → A</option>
+            </select>
+
+            <button type="submit" class="btn">Apply</button>
+
+            {% if search_word or filters.min_price or filters.max_price
+            or filters.year not in [None, '', 'any']
+            or filters.color not in [None, '', 'any']
+            or filters.brand not in [None, '', 'any']
+            or filters.fuel_type not in [None, '', 'any']
+            or filters.sort_by %}
+            <a href="/cars" class="btn btn-danger" style="text-decoration: none;">Clear</a>
+            {% endif %}
+
+        </form>
+
+        <p class="results-count">
+            Showing {{ (page - 1) * 12 + cars|length }} of {{ total_cars }} cars {% if total_pages > 1 %} — Page {{ page
+            }} of {{ total_pages }}{% endif %}
+        </p>
+    </section>
+
+    <!-- ============ COMPARE FLOATING BUTTON ============ -->
+    <button type="button" id="compare-floating-btn" class="btn compare-floating-btn">
+        Compare (0/2)
+    </button>
+
+    <!-- ============ CARS GRID ============ -->
+    <form id="compare-form" action="/compare" method="get">
+        <section class="cars-grid">
+            {% for car in cars %}
+            <div class="car-card">
+
+                <button type="button"
+                    class="wishlist-toggle {{ 'is-active' if car['id'] in wishlist_ids else '' }}"
+                    data-car-id="{{ car['id'] }}" aria-label="Toggle favorite">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M12 21s-7.5-4.6-10-9.1C0.3 8.6 1.7 5 5.1 4.2 7.5 3.6 9.8 4.7 12 7c2.2-2.3 4.5-3.4 6.9-2.8 3.4.8 4.8 4.4 3.1 7.7C19.5 16.4 12 21 12 21z" />
+                    </svg>
+                </button>
+
+                <div class="car-media">
+                    <img src="{{ car['img'] }}" alt="{{ car['name'] }}" loading="lazy"
+                        onerror="this.onerror=null;this.src='https://placehold.co/400x300/eef1f8/62708a?text=No+Image';">
+                </div>
+                <div class="car-body">
+                    <h3>{{ car['name'] }}</h3>
+                    <p class="car-meta">{{ car['brand'] }} · {{ car['year'] }}</p>
+                    <p class="car-price">{{ car['price'] }} $</p>
+
+                    <a href="/car/{{ car['id'] }}" class="btn">View Details</a>
+
+                    <div class="compare-check-row">
+                        <label>
+                            <input type="checkbox" class="compare-checkbox" name="car_id" value="{{ car['id'] }}">
+                            Add to compare
+                        </label>
+                    </div>
+                </div>
+
+            </div>
+            {% else %}
+            <p class="empty-state">No cars found.</p>
+            {% endfor %}
+        </section>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button type="submit" class="btn">Compare selected cars</button>
+        </div>
+    </form>
+
+    <!-- ✅ PAGINATION -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+
+        {% if page > 1 %}
+        <a href="{{ url_for('cars', page=page-1, q=search_word, min_price=filters.min_price, max_price=filters.max_price, year=filters.year, color=filters.color, brand=filters.brand, fuel_type=filters.fuel_type, sort_by=filters.sort_by) }}"
+            class="btn">← Prev</a>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+        <span class="page-current">{{ p }}</span>
+        {% elif p == 1 or p == total_pages or (p >= page - 2 and p <= page + 2) %} <a
+            href="{{ url_for('cars', page=p, q=search_word, min_price=filters.min_price, max_price=filters.max_price, year=filters.year, color=filters.color, brand=filters.brand, fuel_type=filters.fuel_type, sort_by=filters.sort_by) }}"
+            class="btn page-link">{{ p }}</a>
+            {% elif p == page - 3 or p == page + 3 %}
+            <span class="ellipsis">...</span>
+            {% endif %}
+            {% endfor %}
+
+            {% if page < total_pages %} <a
+                href="{{ url_for('cars', page=page+1, q=search_word, min_price=filters.min_price, max_price=filters.max_price, year=filters.year, color=filters.color, brand=filters.brand, fuel_type=filters.fuel_type, sort_by=filters.sort_by) }}"
+                class="btn">Next →</a>
+                {% endif %}
+
+    </div>
+    {% endif %}
+
+    <!-- طبقة تعتيم المقارنة -->
+    <div id="compare-overlay" class="compare-overlay"></div>
+
+    <!-- ============ FOOTER ============ -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="/static/assets/logo-header.png" alt="CarHub">
+                <p>CarHub helps you search, compare, and shortlist cars from every major brand — all in one place.</p>
+            </div>
+            <div class="footer-links">
+                <div>
+                    <h4>Browse</h4>
+                    <ul>
+                        <li><a href="/cars">All Cars</a></li>
+                        <li><a href="/compare">Compare</a></li>
+                        <li><a href="/wishlist">Favorites</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Account</h4>
+                    <ul>
+                        <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 CarHub — Find your perfect ride.</div>
+    </footer>
+
+    <!-- ============ CHATBOT ============ -->
+    <div id="chatbot-wrapper" class="chatbot-wrapper">
+
+        <div id="car-chatbot" class="chatbot-container">
+            <div class="chatbot-header">
+                <div class="chatbot-header-main">
+                    <div class="chatbot-title">🚗 Car Advisor</div>
+                    <div class="chatbot-subtitle">Powered by Gemini AI</div>
+                </div>
+                <div class="chatbot-status">
+                    <span class="chatbot-status-dot"></span>
+                    <span class="chatbot-status-text">Online</span>
+                </div>
+                <button id="chatbot-close" type="button" class="chatbot-close-btn">✕</button>
+            </div>
+            <div class="chatbot-messages" id="chatbot-messages"></div>
+            <div class="chatbot-input-area">
+                <input type="text" id="chatbot-input" placeholder="Ask me about any car or budget..."
+                    autocomplete="off">
+                <button id="chatbot-send-btn" class="btn">Send</button>
+            </div>
+        </div>
+
+        <button id="chatbot-btn" class="chatbot-btn" title="Car AI Advisor">
+            🤖
+        </button>
+
+    </div>
+
+</body>
+
+</html>

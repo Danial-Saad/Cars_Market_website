@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ car['name'] }} - CarHub</title>
+    <link rel="icon" type="image/png" href="/static/assets/favicon.png">
+    <link rel="apple-touch-icon" href="/static/assets/apple-touch-icon.png">
+    <link rel="stylesheet" href="/static/theme.css">
+    <link rel="stylesheet" href="/static/cars.css">
+    <script src="/static/script.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .star-input {
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 4px;
+        }
+
+        .star-input input[type="radio"] {
+            display: none;
+        }
+
+        .star-input label {
+            font-size: 2rem;
+            color: #ccc;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-input input[type="radio"]:checked~label {
+            color: #f59e0b;
+        }
+
+        .star-input label:hover,
+        .star-input label:hover~label {
+            color: #f59e0b;
+        }
+
+        .stars-display {
+            color: #f59e0b;
+        }
+
+        .stars-display .empty {
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ============ HEADER ============ -->
+    <header class="site-header">
+        <a href="/cars" class="brand"><img src="/static/assets/logo-header.png" alt="CarHub"></a>
+        <button id="hamburger" class="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <nav>
+            <ul>
+                <li><a href="/cars">Cars</a></li>
+                <li><a href="/wishlist" class="nav-love">Favorites</a></li>
+                <li><a href="/compare">Compare</a></li>
+                {% if session.get('is_admin') %}
+                <li><a href="/admin" class="nav-admin">Admin</a></li>
+                {% endif %}
+                <li><a href="/profile" class="nav-profile">{{ session['fullname'] }}</a></li>
+                <li><button id="theme-toggle" class="theme-btn">🌙</button></li>
+                <li><a href="/logout" class="nav-logout">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div id="nav-overlay" class="nav-overlay"></div>
+  <div class="header-bevel"></div>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div style="max-width: 1000px; margin: 1rem auto; padding: 0 2rem;">
+        {% for category, message in messages %}
+        <div
+            style="padding: 0.8rem 1.2rem; border-radius: 10px; margin-bottom: 0.5rem;
+                        background: {{ 'var(--color-background-success)' if category == 'success' else ('var(--color-background-info)' if category == 'info' else 'var(--color-background-danger)') }};
+                        color: {{ 'var(--color-text-success)' if category == 'success' else ('var(--color-text-info)' if category == 'info' else 'var(--color-text-danger)') }};">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- ============ CAR DETAILS ============ -->
+    <div class="details-container"
+        style="max-width: 1000px; margin: 2rem auto; padding: 2rem; background: var(--card-bg); border-radius: 20px; box-shadow: 0 10px 30px var(--shadow); display: flex; gap: 3rem; flex-wrap: wrap; align-items: flex-start;">
+
+        <!-- الصورة -->
+        <div style="flex: 1.2; min-width: 300px; position: relative;">
+            <img src="{{ car['img'] }}" alt="{{ car['name'] }}"
+                onerror="this.onerror=null;this.src='https://placehold.co/800x500/eef1f8/62708a?text=No+Image';"
+                style="width: 100%; border-radius: 15px; object-fit: cover; height: 400px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+
+            <button type="button" class="wishlist-toggle wishlist-toggle--lg {{ 'is-active' if car['id'] in wishlist_ids else '' }}"
+                data-car-id="{{ car['id'] }}" aria-label="Toggle favorite">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M12 21s-7.5-4.6-10-9.1C0.3 8.6 1.7 5 5.1 4.2 7.5 3.6 9.8 4.7 12 7c2.2-2.3 4.5-3.4 6.9-2.8 3.4.8 4.8 4.4 3.1 7.7C19.5 16.4 12 21 12 21z" />
+                </svg>
+            </button>
+
+            <!-- معدل التقييم فوق الصورة -->
+            {% if avg_rating %}
+            <div
+                style="position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.7); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.95rem;">
+                ⭐ {{ avg_rating }} / 5
+                <span style="font-size: 0.8rem; opacity: 0.8;">({{ review_count }} review{{ 's' if review_count != 1
+                    else '' }})</span>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- المعلومات -->
+        <div style="flex: 1; min-width: 300px;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 0.5rem; color: var(--text-main);">{{ car['name'] }}</h1>
+
+            <div
+                style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-light);">
+                <span><i class="fas fa-tag"></i> {{ car['brand'] }}</span>
+                <span>•</span>
+                <span><i class="fas fa-calendar-alt"></i> {{ car['year'] }}</span>
+                <span>•</span>
+                <span><i class="fas fa-palette"></i> {{ car['color'] }}</span>
+                <span>•</span>
+                <span><i class="fas fa-gas-pump"></i> {{ car['fuel_type'] }}</span>
+            </div>
+
+            <h2 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 2rem; font-weight: 700;">
+                {{ car['price'] }} $
+            </h2>
+
+            <!-- Description -->
+            <div style="background: var(--bg-color); padding: 1.5rem; border-radius: 15px; margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-main);">Description</h3>
+                <p style="line-height: 1.6; color: var(--text-light);">
+                    {% if car['description'] %}
+                    {{ car['description'] }}
+                    {% else %}
+                    This <strong>{{ car['name'] }}</strong> is in excellent condition. Contact us for more details!
+                    {% endif %}
+                </p>
+            </div>
+
+            <!-- الأزرار -->
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <a href="https://wa.me/963935310812?text=Hello,%20I%20am%20interested%20in%20buying%20the%20{{ car['name'] | urlencode }}%20({{ car['year'] }})%20priced%20at%20{{ car['price'] }}$."
+                    target="_blank" class="btn"
+                    style="background-color: #25D366; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 1rem; font-size: 1.1rem; border-radius: 12px; text-decoration: none;">
+                    <i class="fab fa-whatsapp" style="font-size: 1.5rem;"></i>
+                    Buy via WhatsApp
+                </a>
+                <a href="/cars" class="btn"
+                    style="background: transparent; border: 2px solid var(--text-light); color: var(--text-main); text-align: center; padding: 0.8rem; border-radius: 12px; text-decoration: none;">
+                    Back to Cars List
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ REVIEWS SECTION ============ -->
+    <div style="max-width: 1000px; margin: 2rem auto; padding: 0 2rem;">
+
+        <!-- فورم إضافة / تعديل تقييم -->
+        <div
+            style="background: var(--card-bg); border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 2rem;">
+
+            <h3 style="color: var(--text-main); margin-bottom: 1.5rem;">
+                {{ '✏️ Update Your Review' if user_review else '⭐ Leave a Review' }}
+            </h3>
+
+            <form action="/car/{{ car['id'] }}/review" method="POST">
+
+                <!-- النجوم -->
+                <div style="margin-bottom: 1.2rem;">
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; color: var(--text-light); font-size: 0.9rem; font-weight: bold;">Rating</label>
+                    <div class="star-input">
+                        {% for i in [5, 4, 3, 2, 1] %}
+                        <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" {% if user_review and
+                            user_review['rating']==i %}checked{% endif %} required>
+                        <label for="star{{ i }}" title="{{ i }} star{{ 's' if i > 1 else '' }}">★</label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- التعليق -->
+                <div style="margin-bottom: 1.2rem;">
+                    <label
+                        style="display: block; margin-bottom: 0.5rem; color: var(--text-light); font-size: 0.9rem; font-weight: bold;">
+                        Comment <span style="font-weight: normal;">(optional)</span>
+                    </label>
+                    <textarea name="comment" rows="3" placeholder="Share your thoughts about this car..."
+                        style="width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--shadow); background: var(--bg-color); color: var(--text-main); font-size: 1rem; outline: none; resize: vertical; box-sizing: border-box;">{{ user_review['comment'] if user_review else '' }}</textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                    <button type="submit" class="btn" style="padding: 0.7rem 2rem;">
+                        {{ 'Update Review' if user_review else 'Submit Review' }}
+                    </button>
+                    {% if user_review %}
+                    <a href="/car/{{ car['id'] }}/delete_review"
+                        style="color: #ef4444; text-decoration: none; font-size: 0.9rem;"
+                        onclick="return confirm('Delete your review?')">
+                        🗑️ Delete my review
+                    </a>
+                    {% endif %}
+                </div>
+
+            </form>
+        </div>
+
+        <!-- عرض التقييمات -->
+        {% if reviews %}
+        <div
+            style="background: var(--card-bg); border-radius: 20px; padding: 2rem; box-shadow: 0 4px 20px var(--shadow);">
+
+            <h3 style="color: var(--text-main); margin-bottom: 1.5rem;">
+                💬 Reviews ({{ review_count }})
+                {% if avg_rating %}
+                <span style="color: #f59e0b; font-size: 1rem; margin-left: 10px;">⭐ {{ avg_rating }} / 5</span>
+                {% endif %}
+            </h3>
+
+            {% for review in reviews %}
+            <div style="padding: 1.2rem; border-radius: 12px; background: var(--bg-color); margin-bottom: 1rem;">
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div>
+                        <span style="font-weight: bold; color: var(--text-main);">{{ review['fullname'] }}</span>
+                        <span class="stars-display" style="margin-left: 10px; font-size: 1rem;">
+                            {% for i in range(1, 6) %}
+                            {% if i <= review['rating'] %}★{% else %}<span class="empty">★</span>{% endif %}
+                        {% endfor %}
+                        </span>
+                    </div>
+                    <span style="color: var(--text-light); font-size: 0.85rem;">{{ review['created_at'][:10] }}</span>
+                </div>
+
+                {% if review['comment'] %}
+                <p style="color: var(--text-light); line-height: 1.5; margin: 0;">{{ review['comment'] }}</p>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 2rem; color: var(--text-light);">
+            <p style="font-size: 1.1rem;">No reviews yet. Be the first to review this car! ⭐</p>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="/static/assets/logo-header.png" alt="CarHub">
+                <p>CarHub helps you search, compare, and shortlist cars — all in one place.</p>
+            </div>
+            <div class="footer-links">
+                <div>
+                    <h4>Browse</h4>
+                    <ul>
+                        <li><a href="/cars">All Cars</a></li>
+                        <li><a href="/compare">Compare</a></li>
+                        <li><a href="/wishlist">Favorites</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Account</h4>
+                    <ul>
+                        <li><a href="/profile">My Profile</a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">© 2026 CarHub — Find your perfect ride.</div>
+    </footer>
+
+</body>
+
+</html>

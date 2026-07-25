@@ -1,0 +1,502 @@
+/* =========================================================
+   CARHUB — Page styles (cars, compare, profile, wishlist)
+   Relies on tokens + header/footer defined in theme.css
+   ========================================================= */
+
+/* ============ HERO ============ */
+.hero {
+  background: var(--navy-900);
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(59, 111, 224, 0.35), transparent 55%),
+    radial-gradient(circle at 85% 30%, rgba(91, 143, 249, 0.18), transparent 45%);
+  color: #fff;
+  padding: 3.6rem 1.5rem 3rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url('/static/assets/logo-header.png');
+  background-repeat: no-repeat;
+  background-position: 50% 120%;
+  background-size: 720px auto;
+  opacity: 0.06;
+  filter: blur(0.5px);
+  transform: perspective(600px) rotateX(8deg) scale(1.15);
+  animation: hero-float 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hero-float {
+  0%, 100% { transform: perspective(600px) rotateX(8deg) scale(1.15) translateY(0); }
+  50% { transform: perspective(600px) rotateX(8deg) scale(1.15) translateY(-10px); }
+}
+
+.hero h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  position: relative;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+}
+
+.hero p {
+  color: #a9b5d0;
+  font-size: 1rem;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ============ FILTERS ============ */
+.filters {
+  padding: 1.6rem 1.5rem;
+  text-align: center;
+  background: var(--surface);
+  margin: -1.6rem auto 2rem;
+  border-radius: var(--radius);
+  width: 92%;
+  max-width: 1080px;
+  box-shadow: 0 20px 45px -12px rgba(10, 15, 28, 0.35), 0 2px 0 rgba(255, 255, 255, 0.6) inset;
+  border: 1px solid var(--border);
+  position: relative;
+  z-index: 5;
+}
+
+.filters h2 {
+  margin-bottom: 1rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.filter-form input[type="text"],
+.filter-form input[type="number"],
+.filter-form select {
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  outline: none;
+  font-size: 0.92rem;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: inset 0 2px 4px rgba(16, 24, 40, 0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-form input[type="text"] { width: 230px; }
+.filter-form input[type="number"] { width: 110px; }
+
+.filter-form input:focus,
+.filter-form select:focus {
+  border-color: var(--blue);
+  box-shadow: inset 0 2px 4px rgba(16, 24, 40, 0.06), 0 0 0 3px rgba(59, 111, 224, 0.18);
+}
+
+.results-count {
+  text-align: center;
+  margin-top: 0.9rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* ============ CARS GRID ============ */
+.cars-grid {
+  width: 92%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 1.6rem;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+.car-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 24px -8px var(--shadow), 0 2px 5px rgba(0,0,0,0.04);
+  overflow: hidden;
+  text-align: left;
+  padding: 0 0 1.1rem;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform 0.12s ease-out, box-shadow 0.25s ease;
+  max-width: 350px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.car-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue-light), var(--blue));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.car-card:hover {
+  box-shadow: 0 30px 50px -15px var(--shadow), 0 6px 14px rgba(0,0,0,0.08);
+}
+
+.car-card:hover::before { transform: scaleX(1); }
+
+.car-card .car-body,
+.car-card img { transform: translateZ(0); }
+
+.car-card .car-media {
+  position: relative;
+  overflow: hidden;
+  height: 190px;
+}
+
+.car-card .car-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  background-color: var(--surface-alt);
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.car-card:hover .car-media img {
+  transform: scale(1.06);
+}
+
+.car-card .car-body { padding: 0.9rem 1.1rem 0; }
+
+.car-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.car-meta {
+  color: var(--text-muted);
+  font-size: 0.87rem;
+  margin-bottom: 0.4rem;
+}
+
+.car-price {
+  color: var(--blue);
+  font-weight: 800;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  margin-bottom: 0.9rem;
+}
+
+.car-card .btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  text-decoration: none;
+  margin-top: 0.2rem;
+}
+
+.compare-check-row {
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.compare-check-row label { cursor: pointer; display: flex; align-items: center; gap: 0.4rem; }
+
+.wishlist-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(20, 27, 43, 0.55);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+  z-index: 2;
+  padding: 0;
+}
+.wishlist-toggle:hover { transform: scale(1.12); background: rgba(20, 27, 43, 0.75); }
+
+.wishlist-toggle svg {
+  width: 18px;
+  height: 18px;
+  stroke: #fff;
+  stroke-width: 2;
+  fill: none;
+  transition: fill 0.2s ease, stroke 0.2s ease;
+}
+
+.wishlist-toggle.is-active svg {
+  fill: var(--love);
+  stroke: var(--love);
+  animation: heart-pop 0.35s ease;
+}
+
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.35); }
+  60%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+
+.wishlist-toggle.is-loading { opacity: 0.6; pointer-events: none; }
+
+.wishlist-toggle--lg {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 46px;
+  height: 46px;
+  background: rgba(255, 255, 255, 0.92);
+  border: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+.wishlist-toggle--lg svg { width: 22px; height: 22px; stroke: #333; }
+.wishlist-toggle--lg.is-active svg { fill: var(--love); stroke: var(--love); }
+
+/* zebra empty state */
+.empty-state {
+  text-align: center;
+  width: 100%;
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+}
+
+/* ============ COMPARE FLOATING BUTTON ============ */
+.compare-floating-btn {
+  position: fixed;
+  top: 5.5rem;
+  right: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.compare-floating-btn--active {
+  opacity: 1;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px var(--gold), 0 12px 30px rgba(0, 0, 0, 0.25);
+  transform: scale(1.03);
+}
+
+.compare-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 28, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 900;
+}
+.compare-overlay--visible { opacity: 1; }
+
+/* ============ PAGINATION ============ */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+.pagination .btn {
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+}
+.pagination .page-current {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  background: var(--blue);
+  color: #fff;
+  font-weight: 700;
+}
+.pagination .page-link { opacity: 0.75; }
+.pagination .ellipsis { color: var(--text-muted); padding: 0 4px; }
+
+/* ============ CHATBOT ============ */
+.chatbot-wrapper {
+  position: fixed;
+  bottom: 1.8rem;
+  right: 1.8rem;
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.chatbot-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--blue-light) 0%, var(--blue) 55%, var(--blue-dark) 100%);
+  border: none;
+  border-bottom: 3px solid #1d3f8f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  box-shadow: 0 10px 26px -6px rgba(41, 85, 184, 0.6), inset 0 1px 0 rgba(255,255,255,0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+}
+.chatbot-btn:hover {
+  transform: perspective(400px) rotateX(6deg) scale(1.08);
+  box-shadow: 0 14px 32px -6px rgba(41, 85, 184, 0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.chatbot-btn::after {
+  content: '';
+  position: absolute;
+  top: 4px; right: 4px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--success);
+  border: 2px solid #fff;
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.8);
+}
+
+.chatbot-container {
+  position: absolute;
+  bottom: calc(100% + 0.8rem);
+  right: 0;
+  width: 360px;
+  max-height: 500px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  border: 1px solid var(--border);
+}
+.chatbot-wrapper.chatbot-open .chatbot-container {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+.chatbot-header {
+  background: linear-gradient(135deg, var(--navy-800), var(--navy-700));
+  color: #fff;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.chatbot-title { font-size: 1rem; font-weight: 700; }
+.chatbot-subtitle { font-size: 0.75rem; opacity: 0.75; }
+.chatbot-status { display: flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; color: #cfd7ea; }
+.chatbot-status-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.9);
+}
+.chatbot-close-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: none; color: #fff; font-size: 1.1rem; cursor: pointer;
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.chatbot-close-btn:hover { background: rgba(255, 255, 255, 0.25); }
+
+.chatbot-messages {
+  padding: 0.9rem;
+  flex: 1;
+  overflow-y: auto;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.chatbot-message { display: flex; }
+.chatbot-message--user { justify-content: flex-end; }
+.chatbot-bubble {
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  max-width: 85%;
+  line-height: 1.5;
+  font-size: 0.875rem;
+}
+.chatbot-message--user .chatbot-bubble {
+  background: var(--blue);
+  color: #fff;
+  border-bottom-right-radius: 3px;
+}
+.chatbot-message--bot .chatbot-bubble {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 3px;
+}
+
+.chatbot-dots span {
+  display: inline-block;
+  animation: chatbot-dot 1.2s infinite;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.chatbot-dots span:nth-child(2) { animation-delay: 0.2s; }
+.chatbot-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes chatbot-dot {
+  0%, 80%, 100% { opacity: 0.2; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-4px); }
+}
+
+.chatbot-input-area {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.7rem 0.8rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.chatbot-input-area input {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 0.875rem;
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s;
+}
+.chatbot-input-area input:focus { border-color: var(--blue); }
+.chatbot-input-area .btn { padding: 0.55rem 1rem; font-size: 0.85rem; border-radius: 10px; }
+
+@media (max-width: 640px) {
+  .filter-form input[type="text"] { width: 100%; }
+  .hero { padding: 2.4rem 1rem 2rem; }
+}

@@ -1,0 +1,356 @@
+/* =========================================================
+   CARHUB — Brand Design System
+   Shared tokens, header, footer, buttons, and primitives.
+   Loaded on every page BEFORE the page-specific stylesheet.
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Brand navy — sampled to match the logo artwork exactly */
+  --navy-900: #0a0f1c;
+  --navy-800: #141b2b;
+  --navy-700: #1c2438;
+  --navy-600: #2a3450;
+
+  /* Brand blue accent */
+  --blue: #3b6fe0;
+  --blue-dark: #2955b8;
+  --blue-light: #6c96f2;
+
+  /* Light surface (default site theme) */
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface-alt: #eef1f8;
+  --border: #e2e7f2;
+  --text: #101828;
+  --text-muted: #62708a;
+  --shadow: rgba(16, 24, 40, 0.08);
+
+  /* Semantic accents */
+  --love: #ec4899;
+  --gold: #f2a93c;
+  --danger: #ef4444;
+  --success: #22c55e;
+
+  /* Type */
+  --font-display: 'Sora', 'Segoe UI', sans-serif;
+  --font-body: 'Inter', 'Segoe UI', sans-serif;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  /* Legacy aliases (older templates reference these directly) */
+  --primary: var(--blue);
+  --primary-dark: var(--blue-dark);
+  --bg-color: var(--bg);
+  --card-bg: var(--surface);
+  --text-main: var(--text);
+  --text-light: var(--text-muted);
+
+  --color-background-success: #e7f8ee;
+  --color-text-success: #15703f;
+  --color-border-success: #b7ebc9;
+  --color-background-danger: #fdecec;
+  --color-text-danger: #b42318;
+  --color-border-danger: #f6c6c2;
+  --color-background-info: #eaf1fd;
+  --color-text-info: #1d4ed8;
+  --color-border-info: #bfd7fb;
+}
+
+body.dark-mode {
+  --color-background-success: rgba(34, 197, 94, 0.12);
+  --color-text-success: #4ade80;
+  --color-border-success: rgba(34, 197, 94, 0.35);
+  --color-background-danger: rgba(239, 68, 68, 0.12);
+  --color-text-danger: #f87171;
+  --color-border-danger: rgba(239, 68, 68, 0.35);
+  --color-background-info: rgba(59, 111, 224, 0.14);
+  --color-text-info: #6c96f2;
+  --color-border-info: rgba(59, 111, 224, 0.35);
+}
+
+/* Dark mode = the site content adopts the same navy the logo lives on */
+body.dark-mode {
+  --bg: #0b1220;
+  --surface: #141b2b;
+  --surface-alt: #1a2338;
+  --border: #263250;
+  --text: #eef2f9;
+  --text-muted: #94a3bb;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --blue: #5b8ff9;
+  --blue-dark: #3b6fe0;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+h1, h2, h3, .logo, .chatbot-title {
+  font-family: var(--font-display);
+}
+
+a { color: inherit; }
+
+::selection { background: var(--blue); color: #fff; }
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* =========================================================
+   HEADER — always brand navy, on every page, in every mode
+   3D glass panel: layered depth, inset top highlight, bottom bevel
+   ========================================================= */
+header.site-header {
+  background: linear-gradient(180deg, var(--navy-700) 0%, var(--navy-800) 60%, var(--navy-900) 100%);
+  background-image:
+    radial-gradient(circle at 12% -40%, rgba(91, 143, 249, 0.45), transparent 55%),
+    linear-gradient(180deg, var(--navy-700) 0%, var(--navy-800) 60%, var(--navy-900) 100%);
+  padding: 0.6rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 0 rgba(0, 0, 0, 0.4),
+    0 14px 30px -10px rgba(0, 0, 0, 0.55);
+  position: sticky;
+  top: 0;
+  z-index: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  position: relative;
+}
+
+.brand img {
+  height: 60px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 22px rgba(91, 143, 249, 0.55));
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.brand:hover img {
+  transform: perspective(400px) rotateY(-6deg) scale(1.03);
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 28px rgba(91, 143, 249, 0.75));
+}
+
+header.site-header nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.6rem;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+}
+
+header.site-header nav a,
+header.site-header nav button.theme-btn {
+  text-decoration: none;
+  color: #cfd7ea;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
+  position: relative;
+  padding-bottom: 2px;
+}
+
+header.site-header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  height: 2px;
+  width: 0;
+  background: var(--blue-light);
+  transition: width 0.2s ease;
+}
+
+header.site-header nav a:hover,
+header.site-header nav a.active {
+  color: #ffffff;
+}
+
+header.site-header nav a:hover::after,
+header.site-header nav a.active::after {
+  width: 100%;
+}
+
+header.site-header nav a.nav-love { color: #f472b6; }
+header.site-header nav a.nav-love:hover { color: #f9a8d4; }
+header.site-header nav a.nav-admin { color: var(--gold); }
+header.site-header nav a.nav-admin:hover { color: #ffcb73; }
+header.site-header nav a.nav-profile { color: var(--blue-light); }
+header.site-header nav a.nav-logout { color: #f87171; }
+
+.theme-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 600;
+}
+.hamburger span {
+  width: 24px;
+  height: 2px;
+  background: #fff;
+  display: block;
+}
+
+.nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 15, 28, 0.6);
+  z-index: 400;
+}
+
+@media (max-width: 880px) {
+  .hamburger { display: flex; }
+  header.site-header nav {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    height: 100vh;
+    width: 260px;
+    background: var(--navy-800);
+    padding: 5rem 1.5rem 2rem;
+    transition: right 0.3s ease;
+    z-index: 500;
+  }
+  header.site-header nav.nav-open { right: 0; }
+  header.site-header nav ul {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.4rem;
+  }
+  .nav-overlay.active { display: block; }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+}
+
+/* =========================================================
+   3D HEADER BEVEL — soft depth edge instead of a flat rule
+   ========================================================= */
+.header-bevel {
+  height: 10px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent);
+  pointer-events: none;
+}
+
+/* =========================================================
+   BUTTONS — raised 3D bevel with a pressed state
+   ========================================================= */
+.btn {
+  background: linear-gradient(180deg, var(--blue-light) 0%, var(--blue) 55%, var(--blue-dark) 100%);
+  color: #fff;
+  border: none;
+  border-bottom: 3px solid #1d3f8f;
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 6px 14px -4px rgba(41, 85, 184, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+.btn:hover { filter: brightness(1.06); transform: translateY(-2px); box-shadow: 0 10px 20px -6px rgba(41, 85, 184, 0.6), inset 0 1px 0 rgba(255,255,255,0.35); }
+.btn:active { transform: translateY(1px); border-bottom-width: 1px; box-shadow: 0 3px 8px -3px rgba(41, 85, 184, 0.55), inset 0 1px 0 rgba(255,255,255,0.25); }
+
+.btn-outline {
+  background: var(--surface);
+  color: var(--blue);
+  border: 1.5px solid var(--blue);
+  border-bottom: 3px solid var(--blue);
+  box-shadow: 0 4px 10px -4px var(--shadow);
+}
+.btn-outline:hover { background: var(--blue); color: #fff; }
+
+.btn-danger { background: linear-gradient(180deg, #f87171, var(--danger) 60%, #b91c1c); border-bottom-color: #7f1d1d; }
+.btn-danger:hover { filter: brightness(1.06); }
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+footer.site-footer {
+  background: var(--navy-800);
+  color: #b9c2d8;
+  margin-top: 3rem;
+  padding: 2.6rem 2rem 1.6rem;
+}
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.footer-brand img { height: 34px; margin-bottom: 0.7rem; }
+.footer-brand p {
+  max-width: 280px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #93a0ba;
+}
+.footer-links { display: flex; gap: 3rem; flex-wrap: wrap; }
+.footer-links h4 {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7d8bab;
+  margin: 0 0 0.8rem;
+}
+.footer-links ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.55rem; }
+.footer-links a { color: #cbd3e6; text-decoration: none; font-size: 0.92rem; }
+.footer-links a:hover { color: #fff; }
+.footer-bottom {
+  max-width: 1100px;
+  margin: 1.8rem auto 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 0.8rem;
+  color: #6b7793;
+  text-align: center;
+}
